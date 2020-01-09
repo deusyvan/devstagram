@@ -63,4 +63,42 @@ class UsersController extends Controller{
         
         $this->returnJson($array);
     }
+    
+    public function view($id){
+        $array = array('error'=>'', 'logged'=>FALSE);
+        $method = $this->getMethod();
+        $data = $this->getRequestData();
+        
+        $users = new Users();
+        //Verifica se o token existe e se está válido = true true ou seja logado
+        if(!empty($data['jwt']) && $users->validateJwt($data['jwt'])){
+            $array['logged'] = TRUE;
+            //Verifica se o usuario eh realmente o que está logado - is_me
+            $array['is_me'] = FALSE;
+            if($id == $users->getId()){
+                $array['is_me'] = TRUE;
+            }
+            //Verifica o méthod enviado
+            switch ($method) {
+                case 'GET':
+                    
+                    break;
+                case 'PUT':
+                    
+                    break;
+                case 'DELETE':
+                    
+                    break;
+                
+                default:
+                    $array['error'] = 'Método '.$method.' não disponível!';
+                break;
+            }
+            
+        }else{
+            $array['error'] = 'Acesso negado!';
+        }
+        
+        $this->returnJson($array);
+    }
 }
