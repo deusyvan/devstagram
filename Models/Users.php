@@ -2,6 +2,7 @@
 namespace Models;
 
 use Core\Model;
+use PDO;
 
 class Users extends Model{
     
@@ -49,6 +50,30 @@ class Users extends Model{
         return $this->id_user;
     }
     
+    //Buscando informações do usuario pelo id e definindo avatar senão existir
+    public function getInfo($id){
+        $array = array();
+        $sql = "SELECT id, name, email, avatar FROM users WHERE id = :id";
+        $sql = $this->db->prepare($sql);
+        $sql->bindValue(':id', $id);
+        $sql->execute();
+        
+        if($sql->rowCount() > 0){
+            $array = $sql->fetch(PDO::FETCH_ASSOC);
+            
+            if(!empty($array['avatar'])){
+                $array['avatar'] = BASE_URL.'media/avatar/'.$array['avatar'];
+            }else {
+                $array['avatar'] = BASE_URL.'media/avatar/default.jpg';
+            }
+            
+            
+            
+            
+            
+        }
+        return $array;
+    }
     //Criar o token jwt
     public function createJwt(){
         $jwt = new Jwt();

@@ -81,7 +81,7 @@ class UsersController extends Controller{
             //Verifica o méthod enviado
             switch ($method) {
                 case 'GET':
-                    
+                    $array['data'] = $users->getInfo($id);
                     break;
                 case 'PUT':
                     
