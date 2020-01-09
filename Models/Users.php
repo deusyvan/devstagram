@@ -126,4 +126,57 @@ class Users extends Model{
             return FALSE;
         }
     }
+    
+    public function editInfo($id, $data){
+        //Quem pode editar somente o proprio usuario logado
+        if($id === $this->getId()){
+            
+            $toChange = array();
+            //Verifica os campos que não estão vazio e válidos após atribui para toChange
+            if(!empty($data['name'])){
+                $toChange['name'] = $data['name'];
+            }
+            if(!empty($data['email'])){
+                if(filter_var($data['email'], FILTER_VALIDATE_EMAIL)){
+                    if(!$this->emailExists($data['email'])){
+                        $toChange['email'] = $data['email'];
+                    } else {
+                        return 'E-mail já existente!';
+                    }
+                } else {
+                    return 'E-mail inválido';
+                }
+                
+            }
+            if(!empty($data['pass'])){
+                $toChange['pass'] = password_hash($data['pass'], PASSWORD_DEFAULT);
+            }
+            
+            if(count($toChange) > 0){
+                //Define os campos que não vieram vazios e não inválidos
+                $fields = array();
+                foreach($toChange as $k => $v){
+                    $fields[] = $k.' = :'.$k;
+                }
+                
+                //Monta a query para atualizar no banco
+                $sql = "UPDATE users SET ".implode(',', $fields)." WHERE id = :id";
+                $sql = $this->db->prepare($sql);
+                $sql->bindValue(':id', $id);
+                
+                //Fazer os binds
+                foreach ($toChange as $key => $value) {
+                    $sql->bindValue(":".$key, $value);
+                }
+                
+                $sql->execute();
+                return '';
+            }else {
+                return 'Preencha os dados corretamente!';
+            }
+            
+        }else {
+            return 'Não é permitido editar outro usuário';
+        }
+    }
 }
