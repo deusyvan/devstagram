@@ -57,23 +57,45 @@ class Users extends Model{
         $sql = $this->db->prepare($sql);
         $sql->bindValue(':id', $id);
         $sql->execute();
-        
+        //Achando o usuário
         if($sql->rowCount() > 0){
             $array = $sql->fetch(PDO::FETCH_ASSOC);
+            
+            $photos = new Photos();
             
             if(!empty($array['avatar'])){
                 $array['avatar'] = BASE_URL.'media/avatar/'.$array['avatar'];
             }else {
                 $array['avatar'] = BASE_URL.'media/avatar/default.jpg';
             }
-            
-            
-            
-            
-            
+            //Colocando os seguidores, as que segue e as fotos postadas
+            $array['following'] = $this->getFollowingCount($id);
+            $array['followers'] = $this->getFollowersCount($id);
+            $array['photos_count'] = $photos->getPhotosCount($id);
         }
+        
         return $array;
     }
+    //Buscar quantos estão seguidondo
+    public function getFollowingCount($id_user){
+        $sql = "SELECT COUNT(*) AS c FROM users_following WHERE id_user_active = :id";
+        $sql = $this->db->prepare($sql);
+        $sql->bindValue(':id', $id_user);
+        $sql->execute();
+        $info = $sql->fetch();
+        return $info['c'];
+    }
+    
+    //Buscar quantos seguem
+    public function getFollowersCount($id_user){
+        $sql = "SELECT COUNT(*) AS c FROM users_following WHERE id_user_passive = :id";
+        $sql = $this->db->prepare($sql);
+        $sql->bindValue(':id', $id_user);
+        $sql->execute();
+        $info = $sql->fetch();
+        return $info['c'];
+    }
+    
     //Criar o token jwt
     public function createJwt(){
         $jwt = new Jwt();

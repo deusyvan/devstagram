@@ -82,6 +82,10 @@ class UsersController extends Controller{
             switch ($method) {
                 case 'GET':
                     $array['data'] = $users->getInfo($id);
+                    //Verificar se o usuario existe
+                    if(count($array['data']) === 0){
+                        $array['error'] = 'Usuário não existe';
+                    }
                     break;
                 case 'PUT':
                     
