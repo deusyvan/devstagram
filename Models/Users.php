@@ -76,6 +76,29 @@ class Users extends Model{
         
         return $array;
     }
+    //Os parametros são definidos opcionalmente como 0 e 10 se não vier definido
+    public function getFeed($offset = 0, $per_page = 10){
+        //Quais fotos vai mostrar: buscar o id das pessoas que estou seguindo
+        $followingUsers = $this->getFollowing($this->getId());
+        //Fazer lista das ultimas fotos dos seguidores
+        $p = new Photos();
+        return $p->getFeedCollection($followingUsers, $offset, $per_page);
+    }
+    
+    public function getFollowing($id_user){
+        $array = array();
+        $sql = "SELECT id_user_passive FROM users_following WHERE id_user_active = :id";
+        $sql = $this->db->prepare($sql);
+        $sql->bindValue(":id", $id_user);
+        $sql->execute();
+        if($sql->rowCount() > 0){
+            $data = $sql->fetchAll();
+            foreach($data as $item){
+                $array[] = intval($item['id_user_passive']);
+            }
+        }
+        return $array;
+    }
     //Buscar quantos estão seguidondo
     public function getFollowingCount($id_user){
         $sql = "SELECT COUNT(*) AS c FROM users_following WHERE id_user_active = :id";

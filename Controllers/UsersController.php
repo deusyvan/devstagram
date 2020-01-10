@@ -105,4 +105,41 @@ class UsersController extends Controller{
         
         $this->returnJson($array);
     }
+
+    public function feed(){
+        $array = array('error'=>'', 'logged'=>FALSE);
+        $method = $this->getMethod();
+        $data = $this->getRequestData();
+        
+        $users = new Users();
+        //Verifica se o token existe e se está válido = true true ou seja logado
+        if(!empty($data['jwt']) && $users->validateJwt($data['jwt'])){
+            $array['logged'] = TRUE;
+            //Verifica o metodo
+            if($method == 'GET'){
+                //Realizar a paginação dos feeds com offset iniciando do primeiro
+                $offset = 0;
+                //Pega o offset que o usuario enviou e passa de string para um int
+                if(!empty($data['offset'])){
+                    $offset = intval($data['offset']);
+                }
+                //O usuário define com quantos feeds quer ver por página, padrão 10
+                $per_page = 10;
+                if(!empty($data['per_page'])){
+                    $per_page = intval($data['per_page']);
+                }
+                //Passa para o model as informações para ele criar conforme o usuario pediu
+                $array['data'] = $users->getFeed($offset, $per_page);
+                
+            } else {
+                $array['error'] = 'Método '.$method.' não disponível!';
+            }
+            
+        }else{
+            $array['error'] = 'Acesso negado!';
+        }
+        
+        $this->returnJson($array);
+    }
+
 }
