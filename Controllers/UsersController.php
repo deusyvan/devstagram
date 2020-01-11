@@ -197,13 +197,14 @@ class UsersController extends Controller{
         //Verifica se o token existe e se está válido = true true ou seja logado
         if(!empty($data['jwt']) && $users->validateJwt($data['jwt'])){
             $array['logged'] = TRUE;
-            $array['is_me'] = FALSE;
             //Verifica o méthod enviado para seguir ou deseguir o usuario
             switch ($method) {
                 case 'POST':
+                    //$array['error']='Entrou seguir: ';
                     $users->follow($id_user);
                     break;
                 case 'DELETE':
+                    //$array['error']='Entrou desequir: ';
                     $users->unfollow($id_user);
                     break;
                 default:

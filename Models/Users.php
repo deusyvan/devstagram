@@ -237,7 +237,7 @@ class Users extends Model{
         $sql->execute();
         
         if($sql->rowCount() === 0){
-            $sql = "INSERT INTO user_following (id_user_active, id_user_passive) VALUES 
+            $sql = "INSERT INTO users_following (id_user_active, id_user_passive) VALUES 
                     (:id_user_active, :id_user_passive)";
             $sql = $this->db->prepare($sql);
             $sql->bindValue(':id_user_active', $this->getId());
@@ -251,7 +251,7 @@ class Users extends Model{
     }
     
     public function unfollow($id_user){
-        $sql = "DELETE FROM user_following WHERE id_user_active = :id_user_active AND
+        $sql = "DELETE FROM users_following WHERE id_user_active = :id_user_active AND
                 id_user_passive = :id_user_passive";
         $sql = $this->db->prepare($sql);
         $sql->bindValue(':id_user_active', $this->getId());
