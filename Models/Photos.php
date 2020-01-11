@@ -95,6 +95,35 @@ class Photos extends Model {
         return $array;
     }
     
+    //Busca informações de uma foto
+    public function getPhoto($id_photo){
+        $array = array();
+        $users = new Users();
+        //Busca as fotos dos seguidores. Ex array(0,1,4,18) = IN(0,1,4,18)
+        $sql = "SELECT * FROM photos WHERE id = :id";
+        $sql = $this->db->prepare($sql);
+        $sql->bindValue(':id', $id_photo);
+        $sql->execute();
+            
+        if($sql->rowCount() > 0){
+            $array = $sql->fetch(PDO::FETCH_ASSOC);
+            //Busca o info do referido id seguidor
+            $user_info = $users->getInfo($array['id_user']);
+            //Acrescenta name no array
+            $array['name'] = $user_info['name'];
+            //Acrescenta avatar no array
+            $array['avatar'] = $user_info['avatar'];
+            //Corrige a url dentro do proprio array
+            $array['url'] = BASE_URL.'media/photos/'.$array['url'];
+            //Buscar a quantidade likes
+            $array['like_count'] = $this->getLikeCount($array['id']);
+            //Buscar os comentários
+            $array['comments'] = $this->getComments($array['id']);
+        }
+        
+        return $array;
+    }
+    
     //Busca os comentarios
     public function getComments($id_photo){
         $array = array();

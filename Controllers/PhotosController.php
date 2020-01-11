@@ -46,4 +46,37 @@ class PhotosController extends Controller{
         
         $this->returnJson($array);
     }
+    
+    //Endpoint /photo/id
+    public function view($id_photo){
+        $array = array('error'=>'', 'logged'=>FALSE);
+        
+        $method = $this->getMethod();
+        $data = $this->getRequestData();
+        
+        $users = new Users();
+        $p = new Photos();
+        
+        //Verifica se o token existe e se está válido = true true ou seja logado
+        if(!empty($data['jwt']) && $users->validateJwt($data['jwt'])){
+            $array['logged'] = TRUE;
+            //Verifica o metodo 
+            switch ($method) {
+                case 'GET':
+                    $array['data'] = $p->getPhoto($id_photo);
+                    break;
+                case 'DELETE':
+                    ;
+                    break;
+                default:
+                    $array['error'] = 'Método '.$method.' não disponível!';
+                break;
+            }
+            
+        }else{
+            $array['error'] = 'Acesso negado!';
+        }
+        
+        $this->returnJson($array);
+    }
 }
