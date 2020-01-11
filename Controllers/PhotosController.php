@@ -66,7 +66,8 @@ class PhotosController extends Controller{
                     $array['data'] = $p->getPhoto($id_photo);
                     break;
                 case 'DELETE':
-                    ;
+                    //Só vai retornar algo se houver erro 
+                    $array['error'] = $p->deletePhoto($id_photo, $users->getId());
                     break;
                 default:
                     $array['error'] = 'Método '.$method.' não disponível!';

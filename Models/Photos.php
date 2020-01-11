@@ -158,6 +158,37 @@ class Photos extends Model {
         return $info['c'];
     }
     
+    /* Deletar a Photo */
+    public function deletePhoto($id_photo, $id_user){
+        //Verifica se é o dono da foto
+        $sql = "SELECT id FROM photos WHERE id = :id_photo AND id_user = :id_user";
+        $sql = $this->db->prepare($sql);
+        $sql->bindValue(":id_photo", $id_photo);
+        $sql->bindValue(":id_user", $id_user);
+        $sql->execute();
+        if($sql->rowCount() > 0){
+            $sql = 'DELETE FROM photos WHERE id = :id';
+            $sql = $this->db->prepare($sql);
+            $sql->bindValue(":id", $id_photo);
+            $sql->execute();
+            
+            //Comentários nas fotos
+            $sql = 'DELETE FROM photos_comments WHERE id_photo = :id_photo';
+            $sql = $this->db->prepare($sql);
+            $sql->bindValue(":id_photo", $id_photo);
+            $sql->execute();
+            
+            //Likes nas fotos
+            $sql = 'DELETE FROM photos_likes WHERE id_photo = :id_photo';
+            $sql = $this->db->prepare($sql);
+            $sql->bindValue(":id_photo", $id_photo);
+            $sql->execute();
+            return '';
+        } else {
+            return 'Esta foto não é sua';
+        }
+    }
+    
     public function deleteAll($id_user){
         /* Deletar em Photos */
         //Fotos
@@ -177,7 +208,5 @@ class Photos extends Model {
         $sql = $this->db->prepare($sql);
         $sql->bindValue(":id_user", $id_user);
         $sql->execute();
-        
-        
     }
 }
