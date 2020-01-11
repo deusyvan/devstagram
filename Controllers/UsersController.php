@@ -3,6 +3,7 @@ namespace Controllers;
 
 use \Core\Controller;
 use Models\Users;
+use Models\Photos;
 
 class UsersController extends Controller{
     //
@@ -130,6 +131,49 @@ class UsersController extends Controller{
                 }
                 //Passa para o model as informações para ele criar conforme o usuario pediu
                 $array['data'] = $users->getFeed($offset, $per_page);
+                
+            } else {
+                $array['error'] = 'Método '.$method.' não disponível!';
+            }
+            
+        }else{
+            $array['error'] = 'Acesso negado!';
+        }
+        
+        $this->returnJson($array);
+    }
+    
+    //Endpoint user/{id}/photo
+    public function photos($id_user){
+        $array = array('error'=>'', 'logged'=>FALSE);
+        $method = $this->getMethod();
+        $data = $this->getRequestData();
+        
+        $users = new Users();
+        $p = new Photos();
+        //Verifica se o token existe e se está válido = true true ou seja logado
+        if(!empty($data['jwt']) && $users->validateJwt($data['jwt'])){
+            $array['logged'] = TRUE;
+            $array['is_me'] = FALSE;
+            //Busca o is_me pra saber se as fotos é do usuario ou de outro
+            if($id_user == $users->getId()){
+                $array['is_me'] = TRUE;
+            }
+            //Só possui metodo GET
+            if($method == 'GET'){
+                //Realizar a paginação das fotos com offset iniciando do primeiro
+                $offset = 0;
+                //Pega o offset que o usuario enviou e passa de string para um int
+                if(!empty($data['offset'])){
+                    $offset = intval($data['offset']);
+                }
+                //O usuário define com quantas fotos quer ver por página, padrão 10
+                $per_page = 10;
+                if(!empty($data['per_page'])){
+                    $per_page = intval($data['per_page']);
+                }
+                //Passa para o model as informações para ele visualizar as fotos conforme o usuario pedir
+                $array['data'] = $p->getPhotosFromUser($id_user,$offset, $per_page);
                 
             } else {
                 $array['error'] = 'Método '.$method.' não disponível!';

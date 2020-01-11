@@ -5,6 +5,32 @@ use \Core\Model;
 use PDO;
 
 class Photos extends Model {
+    
+    //Busca as fotos de um usuario específico
+    public function getPhotosFromUser($id_user,$offset, $per_page){
+        //$array = array($id_user);
+        $array = array();
+        $sql = "SELECT * FROM photos WHERE id_user = :id ORDER BY id DESC LIMIT "
+                .$offset.", ".$per_page;
+        $sql = $this->db->prepare($sql);
+        $sql->bindValue(":id", $id_user);
+        $sql->execute();
+        
+        if($sql->rowCount() > 0){
+            //$array = array('entrou' => 'sim');
+            $array = $sql->fetchAll(PDO::FETCH_ASSOC);
+            foreach ($array as $k => $item) {
+                //Monta a url da foto corrigindo a url dentro do proprio array
+                $array[$k]['url'] = BASE_URL.'media/photos/'.$item['url'];
+                //Buscar a quantidade likes
+                $array[$k]['like_count'] = $this->getLikeCount($item['id']);
+                //Buscar os comentários
+                $array[$k]['comments'] = $this->getComments($item['id']);
+            }
+        }
+        
+        return $array;
+    }
     //Buscar ultimas fotos dos usuarios
     public function getFeedCollection($ids, $offset, $per_page){
         $array = array();
