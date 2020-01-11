@@ -17,4 +17,5 @@ $routes['/photos/{id}'] = '/photos/view/:id';
 $routes['/photos/{id}/comment'] = '/photos/comment/:id';
 $routes['/photos/{id}/like'] = '/photos/like/:id';
 
-//Endpoints criadas
+//Comentarios
+$routes['/comments/{id}'] = '/photos/delete_comment/:id';

@@ -225,4 +225,21 @@ class Photos extends Model {
             return 'Comentário vazio';
         }
     }
+    
+    public function deleteComment($id_comment, $id_user){
+        $sql = "SELECT id FROM photos_comments WHERE id_user = :id_user AND id = :id_comment";
+        $sql = $this->db->prepare($sql);
+        $sql->bindValue(":id_user", $id_user);
+        $sql->bindValue(":id_comment", $id_comment);
+        $sql->execute();
+        if($sql->rowCount() > 0){
+            $sql = "DELETE FROM photos_comments WHERE id = :id";
+            $sql = $this->db->prepare($sql);
+            $sql->bindValue(":id", $id_comment);
+            $sql->execute();
+            return '';
+        } else {
+            return "Este comentário não é seu";
+        }
+    }
 }

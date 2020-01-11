@@ -102,9 +102,34 @@ class PhotosController extends Controller{
                         $array['error'] = 'Comentário vazio!';
                     }
                     break;
+                default:
+                    $array['error'] = 'Método '.$method.' não disponível!';
+                    break;
+            }
+            
+        }else{
+            $array['error'] = 'Acesso negado!';
+        }
+        
+        $this->returnJson($array);
+    }
+    
+    public function delete_comment($id_comment){
+        $array = array('error'=>'', 'logged'=>FALSE);
+        
+        $method = $this->getMethod();
+        $data = $this->getRequestData();
+        
+        $users = new Users();
+        $p = new Photos();
+        
+        //Verifica se o token existe e se está válido = true true ou seja logado
+        if(!empty($data['jwt']) && $users->validateJwt($data['jwt'])){
+            $array['logged'] = TRUE;
+            //Verifica o metodo
+            switch ($method) {
                 case 'DELETE':
-                    //Só vai retornar algo se houver erro
-                    //$array['error'] = $p->deletePhoto($id_photo, $users->getId());
+                    $array['error'] = $p->deleteComment($id_comment,$users->getId());
                     break;
                 default:
                     $array['error'] = 'Método '.$method.' não disponível!';
