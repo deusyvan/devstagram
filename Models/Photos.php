@@ -227,7 +227,10 @@ class Photos extends Model {
     }
     
     public function deleteComment($id_comment, $id_user){
-        $sql = "SELECT id FROM photos_comments WHERE id_user = :id_user AND id = :id_comment";
+        $sql = "SELECT photos_comments.id FROM photos_comments  
+                LEFT JOIN photos ON photos.id = photos_comments.id_photo 
+                WHERE (photos_comments.id_user = :id_user AND photos_comments.id = :id_comment)
+                OR (photos_comments.id = :id_comment AND photos.id_user = :id_user)";
         $sql = $this->db->prepare($sql);
         $sql->bindValue(":id_user", $id_user);
         $sql->bindValue(":id_comment", $id_comment);
