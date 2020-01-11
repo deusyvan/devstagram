@@ -209,4 +209,20 @@ class Photos extends Model {
         $sql->bindValue(":id_user", $id_user);
         $sql->execute();
     }
+    
+    public function addComment($id_photo,$id_user,$txt){
+        //Verifica se o txt não está vazio
+        if(!empty($txt)){
+            $sql = "INSERT INTO photos_comments (id_user, id_photo, date_comment, txt) 
+                    VALUES (:id_user, :id_photo, NOW(), :txt)";
+            $sql = $this->db->prepare($sql);
+            $sql->bindValue(":id_user", $id_user);
+            $sql->bindValue(":id_photo", $id_photo);
+            $sql->bindValue(":txt", $txt);
+            $sql->execute();
+            return '';
+        } else {
+            return 'Comentário vazio';
+        }
+    }
 }
