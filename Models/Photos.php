@@ -2,10 +2,40 @@
 namespace Models;
 
 use \Core\Model;
-use PDO;
+use \PDO;
 
 class Photos extends Model {
-    
+    //Busca fotos randonicamente pela quantidade, excludes é opcional
+    public function getRandomPhotos($per_page, $excludes = array()){
+        $array = array();
+        //Vamos garantir que sejam inteiros melhorando a segurança na query "SqlInjection"
+        foreach ($excludes as $k => $item){
+            $excludes[$k] = intval($item);
+        }
+        //Ver se existe excludes para criar a sql sem erros
+        if(count($excludes) > 0){
+            //Como não sabemos quantos são colocamos na query evitando os bindValue
+            $sql = "SELECT * FROM photos WHERE id NOT IN(".implode(',', $excludes).") 
+                    ORDER BY RAND() LIMIT ".$per_page;
+        } else {
+            $sql = "SELECT * FROM photos ORDER BY RAND() LIMIT ".$per_page;
+        }
+        //Roda a query depois de montada
+        $sql = $this->db->query($sql);
+        
+        if($sql->rowCount() > 0){
+            $array = $sql->fetchAll(PDO::FETCH_ASSOC);
+            foreach ($array as $k => $item) {
+                //Monta a url da foto corrigindo a url dentro do proprio array
+                $array[$k]['url'] = BASE_URL.'media/photos/'.$item['url'];
+                //Buscar a quantidade likes
+                $array[$k]['like_count'] = $this->getLikeCount($item['id']);
+                //Buscar os comentários
+                $array[$k]['comments'] = $this->getComments($item['id']);
+            }
+        }
+        return $array;
+    }
     //Busca as fotos de um usuario específico
     public function getPhotosFromUser($id_user,$offset, $per_page){
         //$array = array($id_user);
