@@ -265,4 +265,15 @@ class Photos extends Model {
             return 'Você já deu like nesta foto.';
         }
     }
+    
+    public function unlike($id_photo, $id_user){
+        //Busca o like e deleta
+        $sql = "DELETE FROM photos_likes WHERE id_user = :id_user AND id_photo = :id_photo";
+        $sql = $this->db->prepare($sql);
+        $sql->bindValue(":id_user", $id_user);
+        $sql->bindValue(":id_photo", $id_photo);
+        $sql->execute();
+        
+        return '';
+    }
 }

@@ -162,7 +162,7 @@ class PhotosController extends Controller{
                     $array['error'] = $p->like($id_photo, $users->getId());
                     break;
                 case 'DELETE':
-                    
+                    $array['error'] = $p->unlike($id_photo, $users->getId());
                     break;
                 default:
                     $array['error'] = 'Método '.$method.' não disponível!';
